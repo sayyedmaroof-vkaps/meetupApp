@@ -22,12 +22,29 @@ const dummy_meetups = [
   },
 ]
 
-const Home = () => {
+const Home = props => {
   return (
     <Fragment>
-      <MeetupList meetups={dummy_meetups} />
+      <MeetupList meetups={props.meetups} />
     </Fragment>
   )
+}
+
+// export const getServerSideProps = async context => {
+//   return {
+//     props: {
+//       meetups: dummy_meetups,
+//     },
+//   }
+// }
+
+export async function getStaticProps() {
+  return {
+    props: {
+      meetups: dummy_meetups,
+    },
+    revalidate: 10,
+  }
 }
 
 export default Home
