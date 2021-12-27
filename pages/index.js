@@ -22,9 +22,7 @@ const Home = props => {
 
 export async function getStaticProps() {
   // fetching data from an api
-  const client = await MongoClient.connect(
-    'mongodb+srv://taskapp:0208@cluster0.lfxl7.mongodb.net/nextMeetupApp?retryWrites=true&w=majority'
-  )
+  const client = await MongoClient.connect(process.env.MONGODB_URI)
   const db = client.db()
 
   const meetupsCollection = db.collection('meetups')

@@ -19,9 +19,7 @@ const MeetupDetails = ({ meetupData }) => {
 
 export const getStaticPaths = async () => {
   // fetching data from an api
-  const client = await MongoClient.connect(
-    'mongodb+srv://taskapp:0208@cluster0.lfxl7.mongodb.net/nextMeetupApp?retryWrites=true&w=majority'
-  )
+  const client = await MongoClient.connect(process.env.MONGODB_URI)
   const db = client.db()
 
   const meetupsCollection = db.collection('meetups')
@@ -44,9 +42,7 @@ export const getStaticProps = async context => {
   const meetupId = context.params.meetupId
 
   // fetching data from an api
-  const client = await MongoClient.connect(
-    'mongodb+srv://taskapp:0208@cluster0.lfxl7.mongodb.net/nextMeetupApp?retryWrites=true&w=majority'
-  )
+  const client = await MongoClient.connect(process.env.MONGODB_URI)
   const db = client.db()
 
   const meetupsCollection = db.collection('meetups')
