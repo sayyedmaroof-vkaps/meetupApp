@@ -1,43 +1,71 @@
-import React, { Fragment } from 'react'
+import { Fragment } from 'react'
 import MeetupDetail from '../../components/meetups/MeetupDetail'
+import { MongoClient, ObjectId } from 'mongodb'
+import Meta from '../../components/Meta'
 
-const MeetupDetails = props => {
+const MeetupDetails = ({ meetupData }) => {
   return (
-    <MeetupDetail
-      image={props.image}
-      title={props.title}
-      description={props.description}
-      address={props.address}
-    />
+    <Fragment>
+      <Meta title={meetupData.title} />
+      <MeetupDetail
+        image={meetupData.image}
+        title={meetupData.title}
+        description={meetupData.description}
+        address={meetupData.address}
+      />
+    </Fragment>
   )
 }
 
-export const getStaticPaths = () => {
+export const getStaticPaths = async () => {
+  // fetching data from an api
+  const client = await MongoClient.connect(
+    'mongodb+srv://taskapp:0208@cluster0.lfxl7.mongodb.net/nextMeetupApp?retryWrites=true&w=majority'
+  )
+  const db = client.db()
+
+  const meetupsCollection = db.collection('meetups')
+
+  const meetupData = await meetupsCollection.find({}, { _id: 1 }).toArray()
+
+  client.close()
+
   return {
     fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: 'm1',
-        },
-        params: {
-          meetupId: 'm2',
-        },
+    paths: meetupData.map(meetup => ({
+      params: {
+        meetupId: meetup._id.toString(),
       },
-    ],
+    })),
   }
 }
 
 export const getStaticProps = async context => {
   const meetupId = context.params.meetupId
 
-  console.log(meetupId)
+  // fetching data from an api
+  const client = await MongoClient.connect(
+    'mongodb+srv://taskapp:0208@cluster0.lfxl7.mongodb.net/nextMeetupApp?retryWrites=true&w=majority'
+  )
+  const db = client.db()
+
+  const meetupsCollection = db.collection('meetups')
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  })
+
+  client.close()
+
   return {
     props: {
-      image: 'https://picsum.photos/1000/350',
-      title: 'The first meetup',
-      description: 'The meetup description',
-      address: 'Some street 5, some city, some country',
+      meetupData: {
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        image: selectedMeetup.image,
+        address: selectedMeetup.address,
+        description: selectedMeetup.description,
+      },
     },
   }
 }
